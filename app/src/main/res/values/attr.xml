@@ -29,6 +29,7 @@
         <attr name="flipStyle">
             <enum name="cubic" value="0" />
             <enum name="book" value="1" />
+            <enum name="flip_vertical" value="2" />
         </attr>
     </declare-styleable>
 </resources>

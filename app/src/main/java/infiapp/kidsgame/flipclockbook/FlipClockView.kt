@@ -14,11 +14,11 @@ class FlipClockView @JvmOverloads constructor(
 ) : LinearLayout(ctx, attrs) {
 
     private val digits = mutableListOf<BaseDigitView>()
-    private var flipStyle = Style.CUBIC
+    private var flipStyle = Style.FLIP_VERTICAL // Default to new style, or keep CUBIC/BOOK as default
     private var dWidthPx = 0
     private var dHeightPx = 0
 
-    enum class Style { CUBIC, BOOK }
+    enum class Style { CUBIC, BOOK, FLIP_VERTICAL }
 
     init {
         orientation = HORIZONTAL
@@ -30,24 +30,30 @@ class FlipClockView @JvmOverloads constructor(
         val ta: TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.FlipClockView)
         dWidthPx = ta.getDimensionPixelSize(
             R.styleable.FlipClockView_digitWidth,
-            dp(80)
+            dp(80) // Default width
         )
         dHeightPx = ta.getDimensionPixelSize(
             R.styleable.FlipClockView_digitHeight,
-            dp(120)
+            dp(120) // Default height
         )
-        flipStyle = when (ta.getString(R.styleable.FlipClockView_flipStyle) ?: "cubic") {
+        flipStyle = when (ta.getString(R.styleable.FlipClockView_flipStyle) ?: "flip_vertical") { // Default to new style string
             "book" -> Style.BOOK
-            else -> Style.CUBIC
+            "cubic" -> Style.CUBIC
+            "flip_vertical" -> Style.FLIP_VERTICAL
+            else -> Style.FLIP_VERTICAL // Fallback to new style
         }
         ta.recycle()
     }
 
     private fun buildDigits(ctx: Context) {
+        digits.clear() // Clear any existing digits if this method is ever called again
+        removeAllViews() // Also remove views from layout
+
         repeat(6) { index ->
             val v: BaseDigitView = when (flipStyle) {
-                Style.CUBIC -> CubicDigitView(ctx)
+                Style.CUBIC -> CubicDigitView(ctx) // Assuming CubicDigitView exists and is a BaseDigitView
                 Style.BOOK -> BookDigitView(ctx)
+                Style.FLIP_VERTICAL -> FlipDigitView(ctx)
             }
             v.layoutParams = LayoutParams(dWidthPx, dHeightPx)
             addView(v)
